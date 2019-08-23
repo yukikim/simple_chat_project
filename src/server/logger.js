@@ -1,8 +1,9 @@
 const Log4js = require('log4js')
-import config from 'config';
-Log4js.configure(config.get('log'));
+// import config from 'config';
+const config = require('../../config/default')
+Log4js.configure(config.log);
 
-class Log {
+module.exports = class Log {
   constructor() {
     this.logger = Log4js.getLogger();
   }
@@ -14,4 +15,4 @@ class Log {
   }
 }
 
-export const logger = new Log();
+// export const logger = new Log();

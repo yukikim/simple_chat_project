@@ -1,10 +1,11 @@
-import express from 'express';
-import path from 'path';
-import config from 'config';
+const express = require('express') ;
+const path = require('path') ;
+
+const config = require('../../config/default')
 
 const app = express();
 
-const serverConfig = config.get('server');
+const serverConfig = config.server
 
 const Logs = require('./logger')
 
@@ -12,6 +13,15 @@ const Logs = require('./logger')
 const server = require('http').createServer(app)
 const socketio = require('socket.io')
 const io = socketio.listen(server)
+
+//todo:サーバー起動
+// app.listen(serverConfig.port, ()=> {
+//     Logs.logger.info(`server starting -> [port] ${serverConfig.port} [env] ${process.env.NODE_ENV}`)
+// })
+
+server.listen(serverConfig.port, () => {
+    console.log('起動しました', 'http://localhost:' + serverConfig.port)
+})
 
 // app.use(express.static(path.join('./', 'dist')))
 app.use(express.static(path.resolve(__dirname, '../../dist')))
@@ -47,7 +57,3 @@ io.on('connection', (socket) => {
     })
 })
 
-//todo:サーバー起動
-app.listen(serverConfig.port, ()=> {
-    Logs.logger.info(`server starting -> [port] ${serverConfig.port} [env] ${process.env.NODE_ENV}`)
-})
