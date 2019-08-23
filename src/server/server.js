@@ -8,6 +8,11 @@ const serverConfig = config.get('server');
 
 const Logs = require('./logger')
 
+//todo:WebSocketモジュール
+const server = require('http').createServer(app)
+const socketio = require('socket.io')
+const io = socketio.listen(server)
+
 app.use(express.static(path.join('./', 'dist')));
 
 app.get('/api', (req, res) => {
