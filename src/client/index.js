@@ -1,6 +1,8 @@
-import React from "react";
-import ReactDOM from "react-dom";
+import React from "react"
+import ReactDOM from "react-dom"
 import styles from './styles.js'
+
+import ChatIcon from './images/chat_icon.png'
 
 //todo: Socket.IOでWebSocketサーバに接続する
 import socketio from 'socket.io-client'
@@ -136,7 +138,7 @@ class ChatApp extends React.Component {
             this.setState({join_room: result})
         })
 
-        // リアルタイムにログを受信するように設定
+        //todo: リアルタイムにメッセージを受信するように設定
         socket.on('chat-msg', (obj) => {
             const logs2 = this.state.logs
             obj.key = 'key_' + (this.state.logs.length + 1)
@@ -229,6 +231,7 @@ class ChatApp extends React.Component {
         return (
             <div>
                 <h1>チャットテスト</h1>
+                <img src={ChatIcon} />
                 <div className={'msg_list'}>{messages}</div>
                 <ChatForm />
             </div>

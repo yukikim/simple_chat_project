@@ -23,7 +23,13 @@ const htmlWebpackPlugin = new HtmlWebPackPlugin({
       {
         test: /\.css$/,
         use: ["style-loader", "css-loader"]
-      }
+      },
+        {
+            test: /\.(png|jpg|gif)$/,
+            use: {
+                loader: "file-loader"
+            }
+        }
     ]
   },
   plugins: [htmlWebpackPlugin]
