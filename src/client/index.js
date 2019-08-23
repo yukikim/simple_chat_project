@@ -53,7 +53,10 @@ class ChatForm extends React.Component {
     }
 
     messageChanged (e) {
-        this.setState({message: e.target.value})
+        var inputText = e.target.value
+        // inputText = inputText.replace(/\\r|\\n/g, '<br>')
+        console.log(inputText)
+        this.setState({message: inputText})
     }
     // サーバに名前とメッセージを送信 --- (※3)
     send () {
@@ -73,10 +76,13 @@ class ChatForm extends React.Component {
         return (
             <div>
                 メッセージ:<br />
-                <input value={this.state.message}
-                       onChange={e => this.messageChanged(e)} /><br />
+                <textarea name={'メッセージ'} cols={'50'} rows={'5'} onChange={e => this.messageChanged(e)}></textarea>
+                {/*<input value={this.state.message} onChange={e => this.messageChanged(e)} /><br />*/}
                 <button onClick={e => this.send()}>送信</button>
                 <SendImage />
+                <div className={'debug_area'} style={{whiteSpace: 'pre-line'}}> {/*//todo:表示されるテキストの改行を活かす*/}
+                    {/*{this.state.message}*/}
+                </div>
             </div>
         )
     }
@@ -94,9 +100,15 @@ class SendImage extends React.Component {
     }
 
     sendImg() {
+        console.log('画像データは')
         console.dir(this.state.get_image)
-        socket.emit('image', {name: user, send_img: this.state.get_image})
-        this.setState({get_image: ''})
+        if(this.state.get_image) {
+            socket.emit('image', {name: user, send_img: this.state.get_image})
+            this.setState({get_image: ''})
+        }else {
+            window.alert('画像が選択されていません')
+        }
+        // this.setState({get_image: ''})
     }
 
     render() {
@@ -185,9 +197,9 @@ class ChatApp extends React.Component {
                             return (
                                 <div style={styles.from_my} key={e.key}>
                                     {/*<span className={'avater'}><img src={imgA} /> </span>*/}
-                                    <span>{e.name}</span>
-                                    <span>: {e.message}</span>
-                                    <p className={"send_img"}>
+                                    <p className={'user_name'}>{e.name}</p>
+                                    <div style={{whiteSpace: 'pre-line'}}>{e.message}</div>
+                                    <div className={"send_img"}>
                                         {(() => {
                                             if (e.add_img) {
                                                 return <img src={e.add_img}/>
@@ -196,7 +208,7 @@ class ChatApp extends React.Component {
                                             }
                                         })()}
 
-                                    </p>
+                                    </div>
 
                                     <p style={{clear: 'both'}}/>
                                 </div>
@@ -230,7 +242,7 @@ class ChatApp extends React.Component {
         })
         return (
             <div>
-                <h1>チャットテスト</h1>
+                <h1>Simple Chat</h1>
                 <img src={ChatIcon} />
                 <div className={'msg_list'}>{messages}</div>
                 <ChatForm />
