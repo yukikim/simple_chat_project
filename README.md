@@ -1,3 +1,15 @@
+# チャットアプリ構築
+URLパラメータでルームとユーザーを認識
+
+WebsocketAPIはexpressで構築  
+フロントはreact
+
+    e.g, http://localhost:3000?room=test&user=kimura
+
+- room=ルーム名：同じルーム名で参加できる
+- user=ユーザー名：参加時の名前
+パラメータなしで、だれでも参加できる
+
 # React 開発環境構築
 
 react の基本開発環境の構築です。
