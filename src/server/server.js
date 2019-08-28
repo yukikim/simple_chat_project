@@ -34,11 +34,14 @@ app.get('/', function (req, res) {
 // todo:クライアントが接続したときのイベントを設定
 io.on('connection', (socket) => {
     var room = ''
+    var name = ''
     console.log('ユーザが接続:', socket.client.id) //todo:debug
     //todo:ルーム受信
     socket.on('join_room', (result) => {
         room = result.room
+        name = result.name
         console.log('受信したルームは' + room) //todo:debug
+        console.log('受信したユーザーは' + name) //todo:debug
         socket.join(room)
 
         io.to(room).emit('join_room', result)
