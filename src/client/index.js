@@ -305,7 +305,7 @@ class ChatApp extends React.Component {
         const showUserList = noDupUserList.map((value, key) => {
             if(key !== 0){
                 return (
-                    <li>{value}</li>
+                    <li key={'user_' + key}>{value}</li>
                 )
             }
         })
