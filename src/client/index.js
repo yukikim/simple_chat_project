@@ -60,7 +60,6 @@ class ChatForm extends React.Component {
 
     messageChanged (e) {
         var inputText = e.target.value
-        // inputText = inputText.replace(/\\r|\\n/g, '<br>')
         console.log(inputText)
         this.setState({message: inputText})
     }
@@ -186,7 +185,8 @@ class ChatApp extends React.Component {
         socket.emit('chat-msg', {
             name: user,
             message: '入室しました！',
-            add_img: ''
+            add_img: '',
+            now: moment().format("YYYY/MM/DD HH:mm")
         })
 
         //todo:ルームを受信
@@ -266,6 +266,7 @@ class ChatApp extends React.Component {
                                 <div style={styles.from_my} key={e.key}>
                                     <p className={'user_name'}>{e.name}</p>
                                     <div style={{whiteSpace: 'pre-line'}}>{e.message}</div>
+                                    <p className={'date'}>{e.now}</p>
                                     <div className={"send_img"}>
                                         {(() => {
                                             if (e.add_img) {
@@ -286,6 +287,7 @@ class ChatApp extends React.Component {
                                 <div style={styles.from_opp} key={e.key}>
                                     <p className={'user_name'}>{e.name}</p>
                                     <div style={{whiteSpace: 'pre-line'}}>{e.message}</div>
+                                    <p className={'date'}>{e.now}</p>
                                     <p className={"send_img"}>
                                         {(() => {
                                             if (e.add_img) {
