@@ -161,7 +161,8 @@ class ChatApp extends React.Component {
             join_room: '',
             user: user,
             focus_user: '',
-            focus_status: false
+            focus_status: false,
+            arrUser: []
         }
     }
 
@@ -176,19 +177,24 @@ class ChatApp extends React.Component {
         //todo:ルームを送信
         socket.emit('join_room', {
             room: room,
-            name: name,
+            name: user,
             now: moment().format("YYYY/MM/DD HH:mm")
         })
 
 
+        //todo:入室メッセージの送信
         socket.emit('chat-msg', {
             name: user,
             message: '入室しました！',
             add_img: ''
         })
 
+        //todo:ルームを受信
         socket.on('join_room', (result) => {
-            this.setState({join_room: result.room})
+            this.setState({join_room: result.room}) //todo:ルーム名をステートに保存
+            var addUser = this.state.arrUser
+            addUser.push(result.name) //todo:接続ユーザーをステートに配列として保存
+            this.setState({arrUser: addUser})
         })
 
 
@@ -197,9 +203,8 @@ class ChatApp extends React.Component {
             const logs2 = this.state.logs
             obj.key = 'key_' + (this.state.logs.length + 1)
             console.log(obj)
-            // logs2.unshift(obj) // 既存ログに追加
-            logs2.push(obj) // 既存ログに追加
-            this.setState({logs: logs2})
+            logs2.push(obj) // todo:既存配列にメッセージを追加
+            this.setState({logs: logs2}) //todo:メッセージを追加した配列をステートに保存
 
             this.scrollToBottom()
         })
@@ -213,25 +218,28 @@ class ChatApp extends React.Component {
                 var src = urlCreator.createObjectURL(blob)
                 console.log(src)
 
+                //todo:既存メッセージ配列に追加するために配列を形成する
                 var preLog = {
                     name: imageData.name,
                     message: '',
                     add_img: src
                 }
-                const logs3 = this.state.logs
+                const logs3 = this.state.logs //todo:既存メッセージを変数に
                 preLog.key = 'key_' + (this.state.logs.length + 1)
-                logs3.push(preLog)
+                logs3.push(preLog) //todo:画像を既存メッセージ配列に追加
                 this.setState({logs: logs3})
 
-                this.setState({image_src: src})
+                this.setState({image_src: src}) //todo:画像メッセージを追加した配列をステートに再保存
             }
         })
 
+        //todo:テキストエリアへのフォーカス情報を受信
         socket.on('focus_on', (result) => {
             console.log('フォーカスを受信')
             console.dir(result)
             console.log('フォーカスしているのは' + result.name)
             console.log('フォーカスステータスは' + result.status)
+            //todo:フォーカス情報をステートに保存
             this.setState({focus_user: result.name})
             this.setState({focus_status: result.status})
         })
@@ -242,6 +250,8 @@ class ChatApp extends React.Component {
         console.dir(this.state.logs)
         console.log('入室したルームは' + this.state.join_room)
         console.log('stateに保存したユーザーは:' + this.state.user)
+        console.log('参加しているユーザーは')
+        console.dir(this.state.arrUser)
         // ログ一つずつの描画内容を生成 --- (※6)
         // var msgLogs = this.state.logs
         // msgLogs.reverse()
@@ -328,7 +338,7 @@ class ChatApp extends React.Component {
                     })()}
                 </div>
                 <ChatForm />
-                <div style={ {float:"left", clear: "both"} } ref={(el) => { this.messagesEnd = el; }}></div>
+                <div style={ {float:"left", clear: "both"} } ref={(el) => { this.messagesEnd = el; }}> </div>
             </div>
         )
     }
