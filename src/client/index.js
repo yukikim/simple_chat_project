@@ -105,7 +105,7 @@ class ChatForm extends React.Component {
         return (
             <div>
                 メッセージ:<br />
-                <textarea name={'メッセージ'} cols={'50'} rows={'5'} onChange={e => this.messageChanged(e)} onFocus={e => this.focusIn(e)} onBlur={e => this.focusOut(e)}></textarea>
+                <textarea name={'message'} cols={'50'} rows={'5'} value={this.state.message} onChange={e => this.messageChanged(e)} onFocus={e => this.focusIn(e)} onBlur={e => this.focusOut(e)}></textarea>
                 {/*<input value={this.state.message} onChange={e => this.messageChanged(e)} /><br />*/}
                 <button onClick={e => this.send()}>送信</button>
                 <SendImage />
@@ -308,6 +308,19 @@ class ChatApp extends React.Component {
                 </section>
             )
         })
+
+        var userList = this.state.arrUser //todo:参加ユーザー配列
+        //todo:重複を削除
+        var noDupUserList = userList.filter((x, i, self) => {
+            return self.indexOf(x) === i
+        })
+        const showUserList = noDupUserList.map((value, key) => {
+            if(key !== 0){
+                return (
+                    <li>{value}</li>
+                )
+            }
+        })
         return (
             <div>
                 <header>
@@ -316,6 +329,12 @@ class ChatApp extends React.Component {
                            return <span>ようこそ！{this.state.user} さん</span>
                        }
                     })()}
+                    <div className={'user_list'}>
+                        <p>参加ユーザー</p>
+                        <ul>
+                        {showUserList}
+                        </ul>
+                    </div>
                 </header>
                 <h1>Simple Chat</h1>
                 <img src={ChatIcon} />
