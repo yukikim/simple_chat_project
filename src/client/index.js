@@ -274,7 +274,7 @@ class ChatApp extends React.Component {
                                     <div className={"send_img"}>
                                         {(() => {
                                             if (e.add_img) {
-                                                return <img src={e.add_img}/>
+                                                return <img style={styles.sendImg} src={e.add_img}/>
                                             } else {
                                                 return
                                             }
@@ -295,7 +295,7 @@ class ChatApp extends React.Component {
                                     <p className={"send_img"}>
                                         {(() => {
                                             if (e.add_img) {
-                                                return <img src={e.add_img}/>
+                                                return <img style={styles.sendImg} src={e.add_img}/>
                                             } else {
                                                 return
                                             }
@@ -326,47 +326,55 @@ class ChatApp extends React.Component {
             }
         })
         return (
-            <div>
-                <header>
+            <div style={styles.allText}>
+                <header className="top_nav" style={styles.topNav}>
                     <div className="container">
-                    {(() => {
-                       if(this.state.user){
-                           return <span>ようこそ！{this.state.user} さん</span>
-                       }
-                    })()}
-                    <div className={'user_list'}>
-                        <p>参加ユーザー</p>
-                        <ul>
-                        {showUserList}
-                        </ul>
-                    </div>
-                    </div>
-                    <div className={'disconnect'}>
-                        <button onClick={e => this.disconnect(e)}>接続解除</button>
+                        <div className={'top_logo'}><h1 style={styles.topTitle}><img src={ChatIcon} />ANJ Simple Chat</h1></div>
+                        <div className={'header_info row'}>
+                            <div className={'col-6'}>
+                                {(() => {
+                                    if(this.state.user){
+                                        return <span>ようこそ！{this.state.user} さん</span>
+                                    }
+                                })()}
+                                <div className={'user_list'}>
+                                    <span>参加ユーザー</span>
+                                    <ul className={'list-inline'}>
+                                        {showUserList}
+                                    </ul>
+                                </div>
+                            </div>
+                            <div className={'col-4 offset-2'}>
+                                <div className={'disconnect'}>
+                                    <button className={'btn'} onClick={e => this.disconnect(e)}>接続解除</button>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </header>
-                <h1>Simple Chat</h1>
-                <img src={ChatIcon} />
-                <div className={'msg_list'}>
-                    {messages}
-                    {(() => {
-                       if(this.state.focus_status === true) {
-                           return (
-                            <p className={'focus_status'}>
-                                {this.state.focus_user}:<img src={FocusGif} />
-                                </p>
-                           )
-                       }else if(this.state.focus_status === false) {
-                           return (
-                               <p className={'focus_status'}>
-                               </p>
-                           )
 
-                       }
-                    })()}
+                <div className={'container'}>
+                    <div className={'msg_list'}>
+                        {messages}
+                        {(() => {
+                            if(this.state.focus_status === true) {
+                                return (
+                                    <p className={'focus_status'}>
+                                        {this.state.focus_user}:<img src={FocusGif} />
+                                    </p>
+                                )
+                            }else if(this.state.focus_status === false) {
+                                return (
+                                    <p className={'focus_status'}>
+                                    </p>
+                                )
+
+                            }
+                        })()}
+                    </div>
+                    <ChatForm />
+                    <div style={ {float:"left", clear: "both"} } ref={(el) => { this.messagesEnd = el; }}> </div>
                 </div>
-                <ChatForm />
-                <div style={ {float:"left", clear: "both"} } ref={(el) => { this.messagesEnd = el; }}> </div>
             </div>
         )
     }
