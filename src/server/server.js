@@ -15,10 +15,6 @@ const socketio = require('socket.io')
 const io = socketio.listen(server)
 
 //todo:サーバー起動
-// app.listen(serverConfig.port, ()=> {
-//     Logs.logger.info(`server starting -> [port] ${serverConfig.port} [env] ${process.env.NODE_ENV}`)
-// })
-
 server.listen(serverConfig.port, () => {
     console.log('起動しました', 'http://localhost:' + serverConfig.port)
 })

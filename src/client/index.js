@@ -2,8 +2,6 @@ import React from "react"
 import ReactDOM from "react-dom"
 
 import moment from "moment"
-// var nowTheTime = ''
-// var isNow = moment().format("YYYY/MM/DD HH:mm")
 
 import styles from './styles.js'
 
@@ -63,12 +61,11 @@ class ChatForm extends React.Component {
         console.log(inputText)
         this.setState({message: inputText})
     }
-    // サーバに名前とメッセージを送信 --- (※3)
+    //todo: サーバに名前とメッセージを送信
     send () {
         socket.emit('chat-msg', {
             name: user,
             message: this.state.message,
-            // msg_from: '',
             add_img: '',
             now: moment().format("YYYY/MM/DD HH:mm")
         })
@@ -105,11 +102,9 @@ class ChatForm extends React.Component {
             <div>
                 メッセージ:<br />
                 <textarea name={'message'} cols={'50'} rows={'5'} value={this.state.message} onChange={e => this.messageChanged(e)} onFocus={e => this.focusIn(e)} onBlur={e => this.focusOut(e)}></textarea>
-                {/*<input value={this.state.message} onChange={e => this.messageChanged(e)} /><br />*/}
                 <button onClick={e => this.send()}>送信</button>
                 <SendImage />
                 <div className={'debug_area'} style={{whiteSpace: 'pre-line'}}> {/*//todo:表示されるテキストの改行を活かす*/}
-                    {/*{this.state.message}*/}
                 </div>
             </div>
         )
@@ -123,7 +118,6 @@ class SendImage extends React.Component {
     }
 
     GetFile(e) {
-        // console.dir(e.target.files[0])
         this.setState({get_image: e.target.files[0]})
     }
 
@@ -136,7 +130,6 @@ class SendImage extends React.Component {
         }else {
             window.alert('画像が選択されていません')
         }
-        // this.setState({get_image: ''})
     }
 
     render() {
@@ -252,11 +245,6 @@ class ChatApp extends React.Component {
         console.log('stateに保存したユーザーは:' + this.state.user)
         console.log('参加しているユーザーは')
         console.dir(this.state.arrUser)
-        // ログ一つずつの描画内容を生成 --- (※6)
-        // var msgLogs = this.state.logs
-        // msgLogs.reverse()
-        // console.log('ログを逆順にした')
-        // console.dir(msgLogs.reverse())
         const messages = this.state.logs.map((e) => {
             return (
                 <section>
