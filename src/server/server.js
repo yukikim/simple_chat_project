@@ -59,5 +59,12 @@ io.on('connection', (socket) => {
     socket.on('focus_on', (result) => {
         socket.broadcast.emit('focus_on', result)
     })
+
+    //todo:接続解除時
+    socket.on('exit_room', (result) => {
+        console.log('解除メッセージ')
+        console.dir(result)
+        io.to(room).emit('chat-msg', result)
+    })
 })
 

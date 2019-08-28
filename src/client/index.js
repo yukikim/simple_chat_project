@@ -158,9 +158,25 @@ class ChatApp extends React.Component {
         }
     }
 
+    //todo:下にスクロール
     scrollToBottom = () => {
         const node = ReactDOM.findDOMNode(this.messagesEnd);
         node.scrollIntoView({behavior: "smooth"});
+    }
+
+    //todo:接続解除処理
+    disconnect(e) {
+        //todo:接続を通知
+        console.log('解除押した')
+        socket.emit('exit_room', {
+            room: room,
+            name: user,
+            message: '退室しました！',
+            add_img: '',
+            now: moment().format("YYYY/MM/DD HH:mm")
+        })
+        //todo:接続解除
+        socket.disconnect()
     }
 
     // コンポーネントがマウントされたとき --- (※5)
@@ -305,7 +321,7 @@ class ChatApp extends React.Component {
         const showUserList = noDupUserList.map((value, key) => {
             if(key !== 0){
                 return (
-                    <li key={'user_' + key}>{value}</li>
+                    <li>{value}</li>
                 )
             }
         })
@@ -324,6 +340,9 @@ class ChatApp extends React.Component {
                         {showUserList}
                         </ul>
                     </div>
+                    </div>
+                    <div className={'disconnect'}>
+                        <button onClick={e => this.disconnect(e)}>接続解除</button>
                     </div>
                 </header>
                 <h1>Simple Chat</h1>
