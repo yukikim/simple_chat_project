@@ -38,6 +38,7 @@
     "express": "^4.17.1",
     "file-loader": "^4.2.0",
     "log4js": "^4.4.0",
+    "moment": "^2.24.0",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
     "socket.io": "^2.2.0",

@@ -1,8 +1,14 @@
 import React from "react"
 import ReactDOM from "react-dom"
+
+import moment from "moment"
+// var nowTheTime = ''
+// var isNow = moment().format("YYYY/MM/DD HH:mm")
+
 import styles from './styles.js'
 
 import ChatIcon from './images/chat_icon.png'
+import FocusGif from './images/focus_on.gif'
 
 //todo: Socket.IOでWebSocketサーバに接続する
 import socketio from 'socket.io-client'
@@ -64,19 +70,42 @@ class ChatForm extends React.Component {
             name: user,
             message: this.state.message,
             // msg_from: '',
-            add_img: ''
+            add_img: '',
+            now: moment().format("YYYY/MM/DD HH:mm")
         })
         //todo:roomを送信
         if(room){
-            socket.emit('join_room', room)
+            socket.emit('join_room', {
+                room: room,
+                name: user,
+                now: moment().format("YYYY/MM/DD HH:mm")
+            })
         }
         this.setState({message: ''}) // フィールドをクリア
     }
+
+    focusIn(){
+        console.log('フォーカスしてます')
+        socket.emit('focus_on', {
+            name: user,
+            status: true
+        })
+    }
+    focusOut(){
+        console.log('フォーカスしていません')
+        socket.emit('focus_on', {
+            name: user,
+            status: false
+        })
+    }
+
+
+
     render () {
         return (
             <div>
                 メッセージ:<br />
-                <textarea name={'メッセージ'} cols={'50'} rows={'5'} onChange={e => this.messageChanged(e)}></textarea>
+                <textarea name={'メッセージ'} cols={'50'} rows={'5'} onChange={e => this.messageChanged(e)} onFocus={e => this.focusIn(e)} onBlur={e => this.focusOut(e)}></textarea>
                 {/*<input value={this.state.message} onChange={e => this.messageChanged(e)} /><br />*/}
                 <button onClick={e => this.send()}>送信</button>
                 <SendImage />
@@ -130,33 +159,49 @@ class ChatApp extends React.Component {
             logs: [],
             image_src: '',
             join_room: '',
-            user: user
+            user: user,
+            focus_user: '',
+            focus_status: false
         }
     }
+
+    scrollToBottom = () => {
+        const node = ReactDOM.findDOMNode(this.messagesEnd);
+        node.scrollIntoView({behavior: "smooth"});
+    }
+
     // コンポーネントがマウントされたとき --- (※5)
     componentDidMount () {
 
         //todo:ルームを送信
-        socket.emit('join_room', room)
+        socket.emit('join_room', {
+            room: room,
+            name: name,
+            now: moment().format("YYYY/MM/DD HH:mm")
+        })
 
 
         socket.emit('chat-msg', {
             name: user,
-            message: 'preMsg',
+            message: '入室しました！',
             add_img: ''
         })
 
         socket.on('join_room', (result) => {
-            this.setState({join_room: result})
+            this.setState({join_room: result.room})
         })
+
 
         //todo: リアルタイムにメッセージを受信するように設定
         socket.on('chat-msg', (obj) => {
             const logs2 = this.state.logs
             obj.key = 'key_' + (this.state.logs.length + 1)
             console.log(obj)
-            logs2.unshift(obj) // 既存ログに追加
+            // logs2.unshift(obj) // 既存ログに追加
+            logs2.push(obj) // 既存ログに追加
             this.setState({logs: logs2})
+
+            this.scrollToBottom()
         })
 
         //todo:画像を受信
@@ -175,11 +220,20 @@ class ChatApp extends React.Component {
                 }
                 const logs3 = this.state.logs
                 preLog.key = 'key_' + (this.state.logs.length + 1)
-                logs3.unshift(preLog)
+                logs3.push(preLog)
                 this.setState({logs: logs3})
 
                 this.setState({image_src: src})
             }
+        })
+
+        socket.on('focus_on', (result) => {
+            console.log('フォーカスを受信')
+            console.dir(result)
+            console.log('フォーカスしているのは' + result.name)
+            console.log('フォーカスステータスは' + result.status)
+            this.setState({focus_user: result.name})
+            this.setState({focus_status: result.status})
         })
     }
 
@@ -189,6 +243,10 @@ class ChatApp extends React.Component {
         console.log('入室したルームは' + this.state.join_room)
         console.log('stateに保存したユーザーは:' + this.state.user)
         // ログ一つずつの描画内容を生成 --- (※6)
+        // var msgLogs = this.state.logs
+        // msgLogs.reverse()
+        // console.log('ログを逆順にした')
+        // console.dir(msgLogs.reverse())
         const messages = this.state.logs.map((e) => {
             return (
                 <section>
@@ -242,10 +300,35 @@ class ChatApp extends React.Component {
         })
         return (
             <div>
+                <header>
+                    {(() => {
+                       if(this.state.user){
+                           return <span>ようこそ！{this.state.user} さん</span>
+                       }
+                    })()}
+                </header>
                 <h1>Simple Chat</h1>
                 <img src={ChatIcon} />
-                <div className={'msg_list'}>{messages}</div>
+                <div className={'msg_list'}>
+                    {messages}
+                    {(() => {
+                       if(this.state.focus_status === true) {
+                           return (
+                            <p className={'focus_status'}>
+                                {this.state.focus_user}:<img src={FocusGif} />
+                                </p>
+                           )
+                       }else if(this.state.focus_status === false) {
+                           return (
+                               <p className={'focus_status'}>
+                               </p>
+                           )
+
+                       }
+                    })()}
+                </div>
                 <ChatForm />
+                <div style={ {float:"left", clear: "both"} } ref={(el) => { this.messagesEnd = el; }}></div>
             </div>
         )
     }

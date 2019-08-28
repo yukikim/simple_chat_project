@@ -26,6 +26,7 @@ server.listen(serverConfig.port, () => {
 // app.use(express.static(path.join('./', 'dist')))
 app.use(express.static(path.resolve(__dirname, '../../dist')))
 
+//todo:ルーティング
 app.get('/', function (req, res) {
     res.sendFile(path.resolve(__dirname, '../../dist/index.html'))
 })
@@ -36,11 +37,11 @@ io.on('connection', (socket) => {
     console.log('ユーザが接続:', socket.client.id) //todo:debug
     //todo:ルーム受信
     socket.on('join_room', (result) => {
-        room = result
+        room = result.room
         console.log('受信したルームは' + room) //todo:debug
         socket.join(room)
 
-        io.to(room).emit('join_room', room)
+        io.to(room).emit('join_room', result)
         io.to(room).emit('user_id', socket.client.id)
     })
 
@@ -54,6 +55,10 @@ io.on('connection', (socket) => {
 
     socket.on('image', (imageData) => {
         io.to(room).emit('image', (imageData))
+    })
+
+    socket.on('focus_on', (result) => {
+        socket.broadcast.emit('focus_on', result)
     })
 })
 
