@@ -264,7 +264,6 @@ class ChatApp extends React.Component {
                         if(e.name === this.state.user){
                             return (
                                 <div style={styles.from_my} key={e.key}>
-                                    {/*<span className={'avater'}><img src={imgA} /> </span>*/}
                                     <p className={'user_name'}>{e.name}</p>
                                     <div style={{whiteSpace: 'pre-line'}}>{e.message}</div>
                                     <div className={"send_img"}>
@@ -285,9 +284,8 @@ class ChatApp extends React.Component {
                         }else {
                             return (
                                 <div style={styles.from_opp} key={e.key}>
-                                    {/*<span className={'avater'}><img src={imgB} /> </span>*/}
-                                    <span>{e.name}</span>
-                                    <span>: {e.message}</span>
+                                    <p className={'user_name'}>{e.name}</p>
+                                    <div style={{whiteSpace: 'pre-line'}}>{e.message}</div>
                                     <p className={"send_img"}>
                                         {(() => {
                                             if (e.add_img) {
