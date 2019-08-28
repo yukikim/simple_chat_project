@@ -312,6 +312,7 @@ class ChatApp extends React.Component {
         return (
             <div>
                 <header>
+                    <div className="container">
                     {(() => {
                        if(this.state.user){
                            return <span>ようこそ！{this.state.user} さん</span>
@@ -322,6 +323,7 @@ class ChatApp extends React.Component {
                         <ul>
                         {showUserList}
                         </ul>
+                    </div>
                     </div>
                 </header>
                 <h1>Simple Chat</h1>
