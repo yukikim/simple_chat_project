@@ -36,6 +36,7 @@
   "dependencies": {
     "bootstrap": "^4.3.1",
     "config": "^3.1.0",
+    "emoji-mart": "^2.11.1",
     "express": "^4.17.1",
     "file-loader": "^4.2.0",
     "log4js": "^4.4.0",

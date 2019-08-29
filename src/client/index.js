@@ -9,6 +9,9 @@ import {Container, Navbar, Nav, NavDropdown, Form, FormControl, Button, InputGro
 
 import styles from './styles.js'
 
+import 'emoji-mart/css/emoji-mart.css'
+import { Picker } from 'emoji-mart'
+
 import ChatIcon from './images/chat_icon_mini.png'
 import FocusGif from './images/focus_on.gif'
 
@@ -100,6 +103,12 @@ class ChatForm extends React.Component {
         })
     }
 
+    addEmoji(e){
+        console.log(e.native)
+        let emoji = e.native
+        this.setState({message: this.state.message + emoji})
+    }
+
 
 
     render () {
@@ -118,9 +127,11 @@ class ChatForm extends React.Component {
                     </InputGroup.Append>
                 </InputGroup>
 
+                <span>
+                        <Picker onSelect={e => this.addEmoji(e)}/>
+                    </span>
+
                 <SendImage />
-                <div className={'debug_area'} style={{whiteSpace: 'pre-line'}}> {/*//todo:表示されるテキストの改行を活かす*/}
-                </div>
             </div>
         )
     }
