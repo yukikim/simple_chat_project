@@ -5,7 +5,7 @@ import moment from "moment-timezone"
 
 // import ReactBootstrap from 'react-bootstrap'
 
-import {Container, Navbar, Nav, NavDropdown, Form, FormControl, Button, InputGroup,} from 'react-bootstrap'
+import {Container, Navbar, Nav, NavDropdown, Form, FormControl, Button, InputGroup, Modal} from 'react-bootstrap'
 
 import styles from './styles.js'
 
@@ -59,7 +59,9 @@ class ChatForm extends React.Component {
         super(props)
         this.state = {
             name: '',
-            message: ''
+            message: '',
+            show: false,
+            setShow: false
         }
     }
 
@@ -110,8 +112,20 @@ class ChatForm extends React.Component {
     }
 
 
+    handleClose() {
+        this.setState({setShow: false, show: false})
+    }
+    handleShow() {
+        this.setState({setShow: true, show: true})
+    }
 
     render () {
+
+        // const [show, setShow] = React.useState(false)
+        //
+        // const handleClose = () => setShow(false)
+        // const handleShow = () => setShow(true)
+
         return (
             <div style={styles.inputArea}>
                 {/*メッセージ:<br />*/}
@@ -127,11 +141,31 @@ class ChatForm extends React.Component {
                     </InputGroup.Append>
                 </InputGroup>
 
-                <span>
-                        <Picker onSelect={e => this.addEmoji(e)}/>
-                    </span>
 
                 <SendImage />
+
+                <Button variant="primary" onClick={e => this.handleShow(e)}>
+                    Launch demo modal
+                </Button>
+
+                <Modal show={this.state.show} onHide={e => this.handleClose(e)}>
+                    <Modal.Header closeButton>
+                        <Modal.Title>Modal heading</Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>
+                        <span>
+                            <Picker onSelect={e => this.addEmoji(e)}/>
+                        </span>
+                    </Modal.Body>
+                    <Modal.Footer>
+                        <Button variant="secondary" onClick={e => this.handleClose(e)}>
+                            Close
+                        </Button>
+                        <Button variant="primary" onClick={e => this.handleClose(e)}>
+                            Save Changes
+                        </Button>
+                    </Modal.Footer>
+                </Modal>
             </div>
         )
     }
