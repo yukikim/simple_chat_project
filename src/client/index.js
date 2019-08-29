@@ -3,9 +3,13 @@ import ReactDOM from "react-dom"
 
 import moment from "moment"
 
+// import ReactBootstrap from 'react-bootstrap'
+
+import {Container, Navbar, Nav, NavDropdown, Form, FormControl, Button} from 'react-bootstrap'
+
 import styles from './styles.js'
 
-import ChatIcon from './images/chat_icon.png'
+import ChatIcon from './images/chat_icon_mini.png'
 import FocusGif from './images/focus_on.gif'
 
 //todo: Socket.IOでWebSocketサーバに接続する
@@ -289,7 +293,7 @@ class ChatApp extends React.Component {
                         }else {
                             return (
                                 <div style={styles.from_opp} key={e.key}>
-                                    <p className={'user_name'}>{e.name}</p>
+                                    <p className={'user_name'}><i className="fas fa-user"></i> {e.name}</p>
                                     <div style={{whiteSpace: 'pre-line'}}>{e.message}</div>
                                     <p className={'date'}>{e.now}</p>
                                     <p className={"send_img"}>
@@ -321,37 +325,37 @@ class ChatApp extends React.Component {
         const showUserList = noDupUserList.map((value, key) => {
             if(key !== 0){
                 return (
-                    <li>{value}</li>
+                    <span>{value}</span>
                 )
             }
         })
+
+        //todo:bootstrap navbar
+        // var Navbar = ReactBootstrap.Navbar
+        var navbarInstance = (
+            <Navbar bg="origin" expand="lg" fixed="top">
+                <Container>
+                <Navbar.Brand href=""><img src={ChatIcon} /> ANJ Simple Chat</Navbar.Brand>
+                    <Nav className="mr-auto">
+                            {(() => {
+                                if(this.state.user){
+                                    return <span>ようこそ！{this.state.user} さん</span>
+                                }
+                            })()}
+                    </Nav>
+                <Nav className="mr-sm-2">
+                    <span>参加ユーザー</span>
+                    {showUserList}
+                </Nav>
+                    <Nav className="mr-sm-2">
+                        <Button variant="outline-success" onClick={e => this.disconnect(e)}>退室</Button>
+                    </Nav>
+                </Container>
+            </Navbar>
+        )
         return (
-            <div style={styles.allText}>
-                <header className="top_nav" style={styles.topNav}>
-                    <div className="container">
-                        <div className={'top_logo'}><h1 style={styles.topTitle}><img src={ChatIcon} />ANJ Simple Chat</h1></div>
-                        <div className={'header_info row'}>
-                            <div className={'col-6'}>
-                                {(() => {
-                                    if(this.state.user){
-                                        return <span>ようこそ！{this.state.user} さん</span>
-                                    }
-                                })()}
-                                <div className={'user_list'}>
-                                    <span>参加ユーザー</span>
-                                    <ul className={'list-inline'}>
-                                        {showUserList}
-                                    </ul>
-                                </div>
-                            </div>
-                            <div className={'col-4 offset-2'}>
-                                <div className={'disconnect'}>
-                                    <button className={'btn'} onClick={e => this.disconnect(e)}>接続解除</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </header>
+            <div style={styles.bodyStyle}>
+                {navbarInstance}
 
                 <div className={'container'}>
                     <div className={'msg_list'}>
