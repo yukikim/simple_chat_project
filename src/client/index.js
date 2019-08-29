@@ -1,7 +1,7 @@
 import React from "react"
 import ReactDOM from "react-dom"
 
-import moment from "moment"
+import moment from "moment-timezone"
 
 // import ReactBootstrap from 'react-bootstrap'
 
@@ -71,7 +71,8 @@ class ChatForm extends React.Component {
             name: user,
             message: this.state.message,
             add_img: '',
-            now: moment().format("YYYY/MM/DD HH:mm")
+            now: moment().format("YYYY/MM/DD HH:mm"),
+            fromDate: ''
         })
         //todo:roomを送信
         if(room){
@@ -128,8 +129,15 @@ class SendImage extends React.Component {
     sendImg() {
         console.log('画像データは')
         console.dir(this.state.get_image)
+        var dateNow = ''
         if(this.state.get_image) {
-            socket.emit('image', {name: user, send_img: this.state.get_image})
+            dateNow = moment().format("YYYY/MM/DD HH:mm")
+            socket.emit('image', {
+                name: user,
+                send_img: this.state.get_image,
+                now: dateNow,
+                fromDate: ''
+            })
             this.setState({get_image: ''})
         }else {
             window.alert('画像が選択されていません')
@@ -199,7 +207,8 @@ class ChatApp extends React.Component {
             name: user,
             message: '入室しました！',
             add_img: '',
-            now: moment().format("YYYY/MM/DD HH:mm")
+            now: moment().format("YYYY/MM/DD HH:mm"),
+            fromDate: ''
         })
 
         //todo:ルームを受信
@@ -214,10 +223,32 @@ class ChatApp extends React.Component {
         //todo: リアルタイムにメッセージを受信するように設定
         socket.on('chat-msg', (obj) => {
             const logs2 = this.state.logs
+            console.log('既存ログは')
+            console.dir(logs2)
+            var changeLog = []
+            logs2.map((item, key) => {
+                // var sendedDate = moment(item.now)
+                // sendedDate.locale('ja')
+                // sendedDate.tz('Asia/Tokyo')
+                changeLog.push({
+                    add_img: item.add_img,
+                    key: item.key,
+                    message: item.message,
+                    name: item.name,
+                    now: item.now,
+                    fromDate: moment(item.now).locale('ja').tz('Asia/Tokyo').fromNow()
+                })
+                // item.fromDate = sendedDate.fromNow()
+            })
+            console.log('書き換えたログは')
+            console.dir(changeLog)
             obj.key = 'key_' + (this.state.logs.length + 1)
+            obj.fromDate = moment(obj.now).locale('ja').tz('Asia/Tokyo').fromNow()
             console.log(obj)
-            logs2.push(obj) // todo:既存配列にメッセージを追加
-            this.setState({logs: logs2}) //todo:メッセージを追加した配列をステートに保存
+            // logs2.push(obj) // todo:既存配列にメッセージを追加
+            changeLog.push(obj) // todo:既存配列にメッセージを追加
+            // this.setState({logs: logs2}) //todo:メッセージを追加した配列をステートに保存
+            this.setState({logs: changeLog}) //todo:メッセージを追加した配列をステートに保存
 
             this.scrollToBottom()
         })
@@ -235,7 +266,9 @@ class ChatApp extends React.Component {
                 var preLog = {
                     name: imageData.name,
                     message: '',
-                    add_img: src
+                    add_img: src,
+                    now: imageData.now,
+                    fromDate: moment(imageData.now).locale('ja').tz('Asia/Tokyo').fromNow()
                 }
                 const logs3 = this.state.logs //todo:既存メッセージを変数に
                 preLog.key = 'key_' + (this.state.logs.length + 1)
@@ -260,6 +293,7 @@ class ChatApp extends React.Component {
 
 
     render () {
+        console.log('メッセージログです')
         console.dir(this.state.logs)
         console.log('入室したルームは' + this.state.join_room)
         console.log('stateに保存したユーザーは:' + this.state.user)
@@ -274,7 +308,8 @@ class ChatApp extends React.Component {
                                 <div style={styles.from_my} key={e.key}>
                                     {/*<p className={'user_name'}>{e.name}</p>*/}
                                     <div style={{whiteSpace: 'pre-line'}}>{e.message}</div>
-                                    <p className={'date'}>{e.now}</p>
+                                    {/*<p className={'date'}>{e.now}</p>*/}
+                                    <p className={'from_date'}>{e.fromDate}</p>
                                     <div className={"send_img"}>
                                         {(() => {
                                             if (e.add_img) {
@@ -295,7 +330,8 @@ class ChatApp extends React.Component {
                                 <div style={styles.from_opp} key={e.key}>
                                     <p className={'user_name'}><i className="fas fa-user"></i> {e.name}</p>
                                     <div style={{whiteSpace: 'pre-line'}}>{e.message}</div>
-                                    <p className={'date'}>{e.now}</p>
+                                    {/*<p className={'date'}>{e.now}</p>*/}
+                                    <p className={'from_date'}>{e.fromDate}</p>
                                     <p className={"send_img"}>
                                         {(() => {
                                             if (e.add_img) {
