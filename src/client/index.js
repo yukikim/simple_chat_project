@@ -272,7 +272,7 @@ class ChatApp extends React.Component {
                         if(e.name === this.state.user){
                             return (
                                 <div style={styles.from_my} key={e.key}>
-                                    <p className={'user_name'}>{e.name}</p>
+                                    {/*<p className={'user_name'}>{e.name}</p>*/}
                                     <div style={{whiteSpace: 'pre-line'}}>{e.message}</div>
                                     <p className={'date'}>{e.now}</p>
                                     <div className={"send_img"}>
