@@ -46,10 +46,9 @@ class SetUpApp extends React.Component {
                 <h1>Simple Chat</h1>
                 <img src={ChatIcon} />
                 <div className={'input_box'}>
-                    Room:<br />
-                    <input name={'room'} type={'text'} onChange={e => this.inputRoom(e)} />
-                    Name:<br />
-                    <input name={'inputName'} type={'text'} onChange={e => this.inputName(e)} />
+                    Room:<input name={'room'} type={'text'} onChange={e => this.inputRoom(e)} />
+                    <br />
+                    Name:<input name={'inputName'} type={'text'} onChange={e => this.inputName(e)} />
 
                 </div>
                 <button onClick={e => this.showUrl(e)}>チャットURLを取得する</button>

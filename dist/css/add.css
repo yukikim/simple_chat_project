@@ -1,0 +1,29 @@
+body {
+    font-family: "ヒラギノ角ゴシック Pro", "Hiragino Kaku Gothic Pro", メイリオ, Meiryo, Osaka, "ＭＳ Ｐゴシック", "MS PGothic", sans-serif;
+}
+.bg-origin {
+    background-color: antiquewhite;
+}
+.navbar-brand {
+    color: #2bc5fe;
+}
+
+.container {
+    overflow: hidden;
+}
+.send_img > img {
+    margin-bottom: 30%;
+}
+/*メディアクエリ*/
+
+@media(max-width: 414px) {
+    .navbar {
+        width: 414px;
+    }
+}
+
+@media(max-width: 375px) {
+    .navbar {
+        width: 375px;
+    }
+}

@@ -3,9 +3,10 @@ import ReactDOM from "react-dom"
 
 import moment from "moment-timezone"
 
-// import ReactBootstrap from 'react-bootstrap'
+import {Container, Navbar, Nav, FormControl, Button, InputGroup, Modal} from 'react-bootstrap'
 
-import {Container, Navbar, Nav, NavDropdown, Form, FormControl, Button, InputGroup, Modal} from 'react-bootstrap'
+import ExifOrientationImg from 'react-exif-orientation-img'
+import MediaQuery from "react-responsive"
 
 import styles from './styles.js'
 
@@ -17,7 +18,11 @@ import FocusGif from './images/focus_on.gif'
 
 //todo: Socket.IOでWebSocketサーバに接続する
 import socketio from 'socket.io-client'
-const socket = socketio.connect('http://localhost:3000')
+// const socket = socketio.connect('http://localhost:3000')
+const socket = socketio.connect('https://dedaman.com')
+
+
+const request = require('superagent')
 
 
 //todo:パラメータからルームを取得する(?room=hoge)
@@ -53,7 +58,7 @@ if(param.search(/room/) === 1) {
 console.log('ルーム名は' + room)
 console.log('ユーザーは' + user)
 
-// 書き込みフォームのコンポーネント --- (※2)
+// todo:書き込みフォームのコンポーネント
 class ChatForm extends React.Component {
     constructor (props) {
         super(props)
@@ -121,36 +126,27 @@ class ChatForm extends React.Component {
 
     render () {
 
-        // const [show, setShow] = React.useState(false)
-        //
-        // const handleClose = () => setShow(false)
-        // const handleShow = () => setShow(true)
-
         return (
             <div style={styles.inputArea}>
-                {/*メッセージ:<br />*/}
-                {/*<textarea name={'message'} cols={'50'} rows={'5'} value={this.state.message} onChange={e => this.messageChanged(e)} onFocus={e => this.focusIn(e)} onBlur={e => this.focusOut(e)}></textarea>*/}
 
                 <InputGroup>
                     <InputGroup.Prepend>
                         <InputGroup.Text>メッセージ</InputGroup.Text>
                     </InputGroup.Prepend>
                     <FormControl as="textarea" aria-label="With textarea" value={this.state.message}  onChange={e => this.messageChanged(e)} onFocus={e => this.focusIn(e)} onBlur={e => this.focusOut(e)}/>
-                    <InputGroup.Append>
-                        <button onClick={e => this.send()}>送信</button>
-                    </InputGroup.Append>
                 </InputGroup>
 
+                <div style={{textAlign:'right', marginTop:'5px'}}>
+                    <Button variant="primary" onClick={e => this.send()}>メッセージ送信</Button>
+                    &nbsp;<Button variant="outline-info" size="sm" onClick={e => this.handleShow(e)}>絵文字挿入</Button>
+                </div>
 
+                <hr />
                 <SendImage />
-
-                <Button variant="primary" onClick={e => this.handleShow(e)}>
-                    Launch demo modal
-                </Button>
 
                 <Modal show={this.state.show} onHide={e => this.handleClose(e)}>
                     <Modal.Header closeButton>
-                        <Modal.Title>Modal heading</Modal.Title>
+                        <Modal.Title>絵文字挿入</Modal.Title>
                     </Modal.Header>
                     <Modal.Body>
                         <span>
@@ -159,10 +155,7 @@ class ChatForm extends React.Component {
                     </Modal.Body>
                     <Modal.Footer>
                         <Button variant="secondary" onClick={e => this.handleClose(e)}>
-                            Close
-                        </Button>
-                        <Button variant="primary" onClick={e => this.handleClose(e)}>
-                            Save Changes
+                            挿入終了
                         </Button>
                     </Modal.Footer>
                 </Modal>
@@ -201,36 +194,18 @@ class SendImage extends React.Component {
 
     render() {
         return(
-            <div style={{marginTop:'10px'}}>
+            <div style={{marginTop:'10px', backgroundColor: '#a2c6bd', padding: '10px', borderRadius: '10px'}}>
 
                 <p style={{margin: '0'}}>画像を送る</p>
-                <InputGroup className={"col-12 col-md-6"}>
-                    {/*<FormControl as="file" onChange={e => this.GetFile(e)} />*/}
+                <InputGroup className={"col-12"}>
                     <div className="custom-file">
-                        {/*<input type="file" className="custom-file-input" id="inputGroupFile02">*/}
                             <input className="btn" type="file" name="image" id="inputGroupFile02" onChange={e => this.GetFile(e)} />
-                            {/*<label className="custom-file-label" htmlFor="inputGroupFile02" aria-describedby="inputGroupFileAddon02">Choose file</label>*/}
                     </div>
-                    <InputGroup.Append>
-                        <button onClick={e => this.sendImg()}>送信</button>
-                    </InputGroup.Append>
                 </InputGroup>
+                <div style={{textAlign: 'right'}}>
+                <Button variant="success" onClick={e => this.sendImg()}>画像を送信</Button>
+                </div>
 
-                {/*<div className="input-group mb-3">*/}
-                    {/*<div className="custom-file">*/}
-                        {/*<input type="file" className="custom-file-input" id="inputGroupFile02">*/}
-                            {/*<label className="custom-file-label" htmlFor="inputGroupFile02"*/}
-                                   {/*aria-describedby="inputGroupFileAddon02">Choose file</label>*/}
-                    {/*</div>*/}
-                    {/*<div className="input-group-append">*/}
-                        {/*<span className="input-group-text" id="inputGroupFileAddon02">Upload</span>*/}
-                    {/*</div>*/}
-                {/*</div>*/}
-
-
-
-                {/*<input type="file" name="image" onChange={e => this.GetFile(e)} />*/}
-                {/*<button onClick={e => this.sendImg()}>画像送信</button>*/}
             </div>
         )
     }
@@ -248,14 +223,15 @@ class ChatApp extends React.Component {
             user: user,
             focus_user: '',
             focus_status: false,
-            arrUser: []
+            arrUser: [],
+            check_token: false
         }
     }
 
     //todo:下にスクロール
     scrollToBottom = () => {
-        const node = ReactDOM.findDOMNode(this.messagesEnd);
-        node.scrollIntoView({behavior: "smooth"});
+        const node = ReactDOM.findDOMNode(this.refs.messagesEnd);
+        node.scrollIntoView({behavior: "smooth", block: "end"});
     }
 
     //todo:接続解除処理
@@ -273,8 +249,28 @@ class ChatApp extends React.Component {
         socket.disconnect()
     }
 
+    checkToken(){
+        request
+            .get('https://dedaman.com/chat/check_token')
+            .query({ token: room })
+            .then(res => {
+                console.dir('チェックしたトークンは' + res.body)
+                this.setState({check_token: res.body})
+            })
+            .catch((error) => {
+                if(error) {
+                    console.log('トークンチェクエラー' + error.message)
+                }
+            })
+
+    }
+
+
     // コンポーネントがマウントされたとき --- (※5)
     componentDidMount () {
+
+        //todo:パラメータのトークンをチェックする
+        this.checkToken()
 
         //todo:ルームを送信
         socket.emit('join_room', {
@@ -309,9 +305,6 @@ class ChatApp extends React.Component {
             console.dir(logs2)
             var changeLog = []
             logs2.map((item, key) => {
-                // var sendedDate = moment(item.now)
-                // sendedDate.locale('ja')
-                // sendedDate.tz('Asia/Tokyo')
                 changeLog.push({
                     add_img: item.add_img,
                     key: item.key,
@@ -320,7 +313,6 @@ class ChatApp extends React.Component {
                     now: item.now,
                     fromDate: moment(item.now).locale('ja').tz('Asia/Tokyo').fromNow()
                 })
-                // item.fromDate = sendedDate.fromNow()
             })
             console.log('書き換えたログは')
             console.dir(changeLog)
@@ -358,6 +350,8 @@ class ChatApp extends React.Component {
                 this.setState({logs: logs3})
 
                 this.setState({image_src: src}) //todo:画像メッセージを追加した配列をステートに再保存
+
+                this.scrollToBottom()
             }
         })
 
@@ -390,12 +384,16 @@ class ChatApp extends React.Component {
                                 <div style={styles.from_my} key={e.key}>
                                     <p className={'user_name'}><i className="far fa-user"></i> {e.name}</p>
                                     <div style={{whiteSpace: 'pre-line'}}>{e.message}</div>
-                                    {/*<p className={'date'}>{e.now}</p>*/}
                                         {(() => {
                                             if (e.add_img) {
                                                 return (
                                                     <div className={"send_img"}>
-                                                        <img style={styles.sendImg} src={e.add_img}/>
+                                                        <MediaQuery query="(max-width: 414px)">
+                                                            <img style={styles.sendImg} src={e.add_img}/>
+                                                        </MediaQuery>
+                                                        <MediaQuery query="(min-width: 415px)">
+                                                            <ExifOrientationImg style={styles.sendImg} src={e.add_img}/>
+                                                        </MediaQuery>
                                                     </div>
                                                 )
                                             } else {
@@ -403,8 +401,6 @@ class ChatApp extends React.Component {
                                             }
                                         })()}
 
-
-                                    {/*<p style={{clear: 'both'}}/>*/}
                                     <p style={styles.msgDate} className={'from_date'}>{e.fromDate}</p>
                                 </div>
 
@@ -415,13 +411,16 @@ class ChatApp extends React.Component {
                                     <p style={styles.oppName} className={'user_name'}><i className="fas fa-user"></i> {e.name} <i style={styles.Balloon} className="far fa-comment"></i></p>
 
                                     <div style={{whiteSpace: 'pre-line'}}>{e.message}</div>
-                                    {/*<p className={'date'}>{e.now}</p>*/}
-                                    {/*<p className={"send_img"}>*/}
                                         {(() => {
                                             if (e.add_img) {
                                                 return (
                                                     <div className={"send_img"}>
-                                                        <img style={styles.sendImg} src={e.add_img}/>
+                                                        <MediaQuery query="(max-width: 414px)">
+                                                            <img style={styles.sendImg} src={e.add_img}/>
+                                                        </MediaQuery>
+                                                        <MediaQuery query="(min-width: 415px)">
+                                                            <ExifOrientationImg style={styles.sendImg} src={e.add_img}/>
+                                                        </MediaQuery>
                                                     </div>
                                                 )
                                             } else {
@@ -429,9 +428,6 @@ class ChatApp extends React.Component {
                                             }
                                         })()}
 
-                                    {/*</p>*/}
-
-                                    {/*<p style={{clear: 'both'}}/>*/}
                                     <p style={styles.msgDate} className={'from_date'}>{e.fromDate}</p>
                                 </div>
 
@@ -459,48 +455,62 @@ class ChatApp extends React.Component {
             <Navbar bg="origin" expand="lg" fixed="top">
                 <Container>
                     <Navbar.Brand><img src={ChatIcon} /> <span style={styles.mainColor}>ANJ Simple Chat</span></Navbar.Brand>
-                    <Nav className="mr-auto">
+                    <Nav>
                         {(() => {
                             if(this.state.user){
                                 return <span>ようこそ！{this.state.user} さん</span>
                             }
                         })()}
                     </Nav>
-                    <span className="mr-sm-2">
+                    <span>
                         <small style={styles.smallText}><i className="fas fa-user-friends"></i>参加ユーザー</small><br/>{showUserList}
                     </span>
-                    {/*<Nav className="mr-sm-2">*/}
-                        {/*<Button variant="outline-success" onClick={e => this.disconnect(e)}>退室</Button>*/}
-                    {/*</Nav>*/}
                 </Container>
             </Navbar>
         )
         return (
-            <div style={styles.bodyStyle}>
-                {navbarInstance}
+            <div>
+            {(() => {
+               if(this.state.check_token) {
+                   return (
+                       <div style={styles.bodyStyle}>
+                           {navbarInstance}
 
-                <div className={'container'}>
-                    <div className={'msg_list'}>
-                        {messages}
-                        {(() => {
-                            if(this.state.focus_status === true) {
-                                return (
-                                    <p style={styles.smallText} className={'focus_status'}>
-                                        {this.state.focus_user}:<img src={FocusGif} />
-                                    </p>
-                                )
-                            }else if(this.state.focus_status === false) {
-                                return (
-                                    <p className={'focus_status'}>
-                                    </p>
-                                )
+                           <div className={'container'}>
+                               <div className={'msg_list'}>
+                                   {messages}
+                                   {(() => {
+                                       if(this.state.focus_status === true) {
+                                           return (
+                                               <p style={styles.smallText} className={'focus_status'}>
+                                                   {this.state.focus_user}:<img src={FocusGif} />
+                                               </p>
+                                           )
+                                       }else if(this.state.focus_status === false) {
+                                           return (
+                                               <p className={'focus_status'}>
+                                               </p>
+                                           )
 
-                            }
-                        })()}
-                    </div>
-                    <ChatForm />
-                    <div style={ {float:"left", clear: "both"} } ref={(el) => { this.messagesEnd = el; }}> </div>
-                </div>
+                                       }
+                                   })()}
+                               </div>
+                               <ChatForm />
+                               <div className="link_cc">
+                                   データ送信の際は<a className={'btn btn-success'} href="https://www5.cloudcubez.jp/index.php/login" target={'_blank'}><i className="fas fa-cloud-upload-alt"></i>こちら</a>をご利用ください。
+                               </div>
+                           </div>
+                           <div ref="messagesEnd">&nbsp;</div>
+                       </div>
+                   )
+               }else {
+                   return (
+                       <div>
+                           トークンエラーです！
+                       </div>
+                       )
+               }
+            })()}
             </div>
         )
     }
