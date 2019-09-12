@@ -19,7 +19,14 @@ WebsocketAPIはexpressで構築
 
 チャットのURLを出力するための設定アプリを作成する
 
-src/
+設置サーバー
+
+Conoha(118.27.3.109)/usr/share/nginx/html/makeurl
+
+URL:https://dedaman.com/makeurl/
+
+- ログインID:2723
+- パスワード:2723
 
 
 ---
