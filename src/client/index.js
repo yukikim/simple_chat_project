@@ -16,6 +16,8 @@ import { Picker } from 'emoji-mart'
 import ChatIcon from './images/chat_icon_mini.png'
 import FocusGif from './images/focus_on.gif'
 
+import DropZone from 'react-dropzone'
+
 //todo: Socket.IOでWebSocketサーバに接続する
 import socketio from 'socket.io-client'
 // const socket = socketio.connect('http://localhost:3000')
@@ -46,6 +48,7 @@ function queryString(param, idDecode) {
 }
 
 
+console.log('パラメータ取得')
 console.log(param)
 var room = ''
 var user = ''
@@ -164,11 +167,13 @@ class ChatForm extends React.Component {
     }
 }
 
+
 class SendImage extends React.Component {
     constructor(props) {
         super(props)
         this.state = {get_image: ''}
     }
+
 
     GetFile(e) {
         this.setState({get_image: e.target.files[0]})
@@ -192,19 +197,65 @@ class SendImage extends React.Component {
         }
     }
 
+
+    handleOpenClick() {
+    this.dropzone.open()
+  }
+    handleDrop(accepted) {
+        console.log('ドロップゾーンログ')
+        console.dir(accepted[0])
+        this.setState({get_image: accepted[0]})
+
+    }
+
+
     render() {
+
+
         return(
-            <div style={{marginTop:'10px', backgroundColor: '#a2c6bd', padding: '10px', borderRadius: '10px'}}>
+            <div id={'send-img'} style={{marginTop:'10px', backgroundColor: '#a2c6bd', padding: '10px', borderRadius: '10px'}}>
 
                 <p style={{margin: '0'}}>画像を送る</p>
-                <InputGroup className={"col-12"}>
-                    <div className="custom-file">
-                            <input className="btn" type="file" name="image" id="inputGroupFile02" onChange={e => this.GetFile(e)} />
-                    </div>
-                </InputGroup>
-                <div style={{textAlign: 'right'}}>
-                <Button variant="success" onClick={e => this.sendImg()}>画像を送信</Button>
-                </div>
+
+                <DropZone
+                    ref={(node) => this.dropzone = node}
+                    // accept="image/jpg,image/png"
+                    onDrop={acceptedFiles => this.handleDrop(acceptedFiles)}
+                    onChange={acceptedFiles => this.handleDrop(acceptedFiles)}
+                >
+                    {({getRootProps, getInputProps}) => (
+                        <section id={"target"} style={{display: 'none'}}>
+                            <div {...getRootProps()} style={{
+                                backgroundColor:'white',
+                                height:'300px',
+                                width:'300px',
+                                position:'absolute',
+                                left:'50%',
+                                marginLeft:'-150px',
+                                marginTop:'-300px',
+                                padding:'10px',
+                                border:'solid 1px #999999'
+                            }}>
+                                <input {...getInputProps()} />
+                                <p>ファイルをココにドラッグ！</p>
+                            </div>
+                        </section>
+                    )}
+                </DropZone>
+                <button type="button" onClick={(e) => this.handleOpenClick(e)}>
+                    ファイルを選択
+                </button>
+                {(()=>{
+                   if(this.state.get_image){
+                       return (
+                           <div style={{textAlign:'right'}}>
+                               <p style={{textAlign:'left'}}>選択ファイル名: {this.state.get_image.name}</p>
+                               <Button variant="success" onClick={e => this.sendImg()}>画像を送信</Button>
+                           </div>
+                       )
+                   }
+                })()}
+
 
             </div>
         )
@@ -224,7 +275,10 @@ class ChatApp extends React.Component {
             focus_user: '',
             focus_status: false,
             arrUser: [],
-            check_token: false
+            // check_token: false,
+            check_token: true,
+            on_drag: false
+            // check_token: true
         }
     }
 
@@ -255,7 +309,7 @@ class ChatApp extends React.Component {
             .query({ token: room })
             .then(res => {
                 console.dir('チェックしたトークンは' + res.body)
-                this.setState({check_token: res.body})
+                // this.setState({check_token: res.body})
             })
             .catch((error) => {
                 if(error) {
@@ -265,9 +319,26 @@ class ChatApp extends React.Component {
 
     }
 
+    dragOn() {
+        const target = document.getElementById('target')
+        target.style.display = `block`
+
+    }
+    dragOff() {
+        const target = document.getElementById('target')
+        target.style.display = `none`
+
+    }
 
     // コンポーネントがマウントされたとき --- (※5)
     componentDidMount () {
+
+        //todo:イベント設定
+        this.eventDragOn = this.dragOn.bind(this)
+        window.addEventListener('dragover', this.eventDragOn)
+
+        this.eventDragOff = this.dragOff.bind(this)
+        window.addEventListener('drop', this.eventDragOff)
 
         //todo:パラメータのトークンをチェックする
         this.checkToken()
@@ -367,6 +438,11 @@ class ChatApp extends React.Component {
         })
     }
 
+    componentWillUnmount() {
+        window.removeEventListener('dragover', this.eventDragOn)
+        window.removeEventListener('drop', this.eventDragOff)
+    }
+
 
     render () {
         console.log('メッセージログです')
@@ -375,6 +451,8 @@ class ChatApp extends React.Component {
         console.log('stateに保存したユーザーは:' + this.state.user)
         console.log('参加しているユーザーは')
         console.dir(this.state.arrUser)
+        console.log('ドラッグを検知')
+        console.log(this.state.on_drag)
         const messages = this.state.logs.map((e) => {
             return (
                 <section>
@@ -468,6 +546,9 @@ class ChatApp extends React.Component {
                 </Container>
             </Navbar>
         )
+
+
+
         return (
             <div>
             {(() => {
@@ -511,6 +592,10 @@ class ChatApp extends React.Component {
                        )
                }
             })()}
+
+
+
+
             </div>
         )
     }

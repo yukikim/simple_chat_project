@@ -45,6 +45,7 @@
     "react": "^16.8.6",
     "react-bootstrap": "^1.0.0-beta.12",
     "react-dom": "^16.8.6",
+    "react-dropzone": "^10.1.9",
     "react-exif-orientation-img": "^0.1.5",
     "react-responsive": "^8.0.0",
     "socket.io": "^2.2.0",
