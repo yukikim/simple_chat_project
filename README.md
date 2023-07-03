@@ -1,17 +1,11 @@
 ## チャットアプリ構築
 URLパラメータでルームとユーザーを認識
 
-#### ConoHa VPS
-
-vps-2019-05-22-bot-api (118.27.3.109)  
-IP:118.27.3.109
-
-root:Anj@000525
 
 - メモリ 1GB/CPU 2Core
 - SSD 50GB
 - ドメイン設定
-- dedaman.com
+- xxxxxxx
 - SSL証明:Let's Encrypt
 
 - node v7.10.1
@@ -28,5 +22,5 @@ root:Anj@000525
 /usr/share/nginx/html/line
 
 #### URL
-https://dedaman.com/line?room=[トークン]&user=[ユーザー]
+https://xxxxxxx/line?room=[トークン]&user=[ユーザー]
 
